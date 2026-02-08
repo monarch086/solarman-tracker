@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Amazon.Lambda.Core" Version="2.8.1" />
+    <PackageReference Include="AWSSDK.DynamoDBv2" Version="4.0.14" />
+  </ItemGroup>
+
 </Project>
