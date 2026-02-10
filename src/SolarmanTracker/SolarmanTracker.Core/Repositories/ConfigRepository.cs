@@ -2,6 +2,7 @@
 using Amazon.DynamoDBv2.DocumentModel;
 using Amazon.Lambda.Core;
 using SolarmanTracker.Core.DataModel;
+using SolarmanTracker.Core.Mappings;
 
 namespace SolarmanTracker.Core.Repositories
 {

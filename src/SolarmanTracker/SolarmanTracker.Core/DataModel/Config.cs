@@ -2,7 +2,11 @@
 {
     public sealed class Config
     {
-        public string DeviceId { get; set; }
+        public string AppId { get; set; }
+
+        public string AppSecret { get; set; }
+
+        public string DeviceSn { get; set; }
 
         public bool IsActive { get; set; }
 

@@ -1,5 +1,4 @@
 <Solution>
   <Project Path="SolarmanTracker.Core/SolarmanTracker.Core.csproj" />
-  <Project Path="TrackingLambda.Tests/TrackingLambda.Tests.csproj" />
   <Project Path="TrackingLambda/TrackingLambda.csproj" />
 </Solution>
