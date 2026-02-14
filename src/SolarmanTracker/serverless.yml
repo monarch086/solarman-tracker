@@ -1,0 +1,55 @@
+# https://www.serverless.com/framework/docs-providers-aws-guide-functions
+service: solarman-tracker
+
+provider:
+  name: aws
+  runtime: dotnet8
+  region: eu-central-1
+  memorySize: 256
+  versionFunctions: false
+  tags:
+    name: solarman-tracker
+    stage: ${sls:stage}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:DescribeTable
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - 'arn:aws:dynamodb:eu-central-1:469321902251:table/SolarmanTracker.${sls:stage}.*'
+        - Effect: "Allow"
+          Action:
+           - "ssm:GetParameter"
+          Resource: "arn:aws:ssm:eu-central-1:469321902251:parameter/SolarmanTracker/${sls:stage}/*"
+
+package:
+  individually: true
+
+custom:
+  environments:
+    dev:
+      environment: development
+    prod:
+      environment: production
+
+functions:
+  tracking-lambda:
+    handler: TrackingLambda::TrackingLambda.Function::FunctionHandler
+    package:
+      artifact: TrackingLambda/bin/Release/net8.0/deploy-tracking-lambda.zip
+    name: solarman-tracker-${sls:stage}-tracking-lambda
+    environment:
+      STAGE: ${opt:stage, self:provider.stage}
+    timeout: 60
+    memorySize: 256
+    events:
+      - schedule:
+          rate: cron(0/10 * * * ? *) # Every 10 minutes
+          enabled: true
