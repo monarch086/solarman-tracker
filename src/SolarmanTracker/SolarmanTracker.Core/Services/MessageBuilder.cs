@@ -1,4 +1,5 @@
 ﻿using SolarmanTracker.Core.DataModel.DataLoaderModels;
+using SolarmanTracker.Core.Extensions;
 using System.Text;
 
 namespace SolarmanTracker.Core.Services
@@ -9,6 +10,8 @@ namespace SolarmanTracker.Core.Services
         private const string ENERGY_ICON = "⚡";
         private const string CHECK_ICON = "✅";
         private const string CROSS_ICON = "❌";
+
+        private const string TIME_FORMAT = @"dd MMM H:mm";
 
         public static string Build(RealTimeStationResponse response)
         {
@@ -23,8 +26,8 @@ namespace SolarmanTracker.Core.Services
                 sb.Append($"{CROSS_ICON} Електроенергія в мережі відсутня.\n");
             }
 
-            sb.Append($"Рівень заряду батарей: {response.batterySoc}%");
-            sb.Append($"Час оновлення даних: {response.lastUpdateTime.ToString("O")}.");
+            sb.Append($"Рівень заряду батарей: {response.batterySoc}%\n");
+            sb.Append($"Час оновлення даних: {response.lastUpdateTime.ToKyivTime().ToString(TIME_FORMAT)}.");
 
             return sb.ToString();
         }
