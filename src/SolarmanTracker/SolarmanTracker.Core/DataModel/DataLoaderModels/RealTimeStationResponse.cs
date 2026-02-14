@@ -1,4 +1,7 @@
-﻿namespace SolarmanTracker.Core.DataModel.DataLoaderModels
+﻿using SolarmanTracker.Core.Converters;
+using System.Text.Json.Serialization;
+
+namespace SolarmanTracker.Core.DataModel.DataLoaderModels
 {
     public sealed class RealTimeStationResponse
     {
@@ -14,6 +17,7 @@
 
         public float dischargePower { get; set; }
 
+        [JsonConverter(typeof(UnixTimestampConverter))]
         public DateTime lastUpdateTime { get; set; }
 
         public float generationPower { get; set; }
