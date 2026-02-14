@@ -9,10 +9,14 @@ namespace SolarmanTracker.Core.Mappings
         {
             return new Config
             {
+                StationId = document["StationId"].AsString(),
                 AppId = document["AppId"].AsString(),
                 AppSecret = document["AppSecret"].AsString(),
-                DeviceSn = document["DeviceSn"].AsString(),
                 IsActive = document["IsActive"].AsBoolean(),
+                AccessToken = document["AccessToken"].AsString(),
+                //AccessTokenExpDate = document["AccessTokenExpDate"].AsDateTimeUtc(),
+                RefreshToken = document["RefreshToken"].AsString(),
+                DeviceSn = document["DeviceSn"].AsString(),
                 ChatId = document["ChatId"].AsString(),
             };
         }

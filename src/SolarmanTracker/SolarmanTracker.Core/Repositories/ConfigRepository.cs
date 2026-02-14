@@ -15,7 +15,9 @@ namespace SolarmanTracker.Core.Repositories
         public ConfigRepository(string stage, ILambdaLogger logger)
         {
             client = new AmazonDynamoDBClient();
-            configTable = new TableBuilder(client, $"SolarmanTracker.{stage}.Configs").Build();
+            configTable = new TableBuilder(client, $"SolarmanTracker.{stage}.Configs")
+                .AddHashKey("StationId", DynamoDBEntryType.String)
+                .Build();
             this.logger = logger;
         }
 
