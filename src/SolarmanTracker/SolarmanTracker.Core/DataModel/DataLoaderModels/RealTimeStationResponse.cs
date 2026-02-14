@@ -29,5 +29,8 @@ namespace SolarmanTracker.Core.DataModel.DataLoaderModels
         public float batteryPower { get; set; }
 
         public bool success { get; set; }
+
+        [JsonIgnore]
+        public bool isElectricityPresent => wirePower > 0;
     }
 }

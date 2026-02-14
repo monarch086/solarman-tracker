@@ -17,7 +17,7 @@ namespace SolarmanTracker.Core.Services
         {
             var sb = new StringBuilder($"{ENERGY_ICON} <b>Статус інвертора:</b>\n");
 
-            if (response.wirePower > 0)
+            if (response.isElectricityPresent)
             {
                 sb.Append($"{CHECK_ICON} Електроенергія в мережі наявна.\n");
             }

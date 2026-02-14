@@ -1,5 +1,6 @@
 using Amazon.Lambda.Core;
 using SolarmanTracker.Core;
+using SolarmanTracker.Core.DataModel;
 using SolarmanTracker.Core.DataModel.DataLoaderModels;
 using SolarmanTracker.Core.Repositories;
 using SolarmanTracker.Core.Services;
@@ -20,7 +21,9 @@ public class Function
     {
         var stage = Environment.GetEnvironmentVariable("STAGE");
         var configsRepository = new ConfigRepository(stage, context.Logger);
-        var config = await SsmConfigBuilder.Build(stage, context.Logger);
+        var stateRepository = new StationStateRepository(stage, context.Logger);
+
+        var messengerConfig = await SsmConfigBuilder.Build(stage, context.Logger);
 
         var dataLoader = new SolarmanDataLoader(context.Logger);
 
@@ -39,11 +42,30 @@ public class Function
                         context.Logger.LogWarning($"Failed to parse real-time data for StationId: {device.StationId}. Skipping.");
                         continue;
                     }
+                    var latestState = await stateRepository.GetLatest(device.StationId);
+                    var latestResponse = !string.IsNullOrWhiteSpace(latestState?.JsonData)
+                        ? JsonSerializer.Deserialize<RealTimeStationResponse>(latestState.JsonData)
+                        : null;
 
+                    var isNewResponse = latestResponse == null || dataParsed.lastUpdateTime > latestResponse.lastUpdateTime;
+                    var isStateChanged = latestResponse == null
+                        || dataParsed.batterySoc != latestResponse.batterySoc
+                        || dataParsed.isElectricityPresent != latestResponse.isElectricityPresent;
 
-                    var bot = new ChatBot(config.Token);
-                    var message = MessageBuilder.Build(dataParsed);
-                    await bot.Post(message, device.ChatId);
+                    context.Logger.LogInformation($"Device with StationId: {device.StationId}, isNewResponse: {isNewResponse}.");
+                    context.Logger.LogInformation($"Device with StationId: {device.StationId}, isStateChanged: {isStateChanged}.");
+
+                    if (isStateChanged)
+                    {
+                        var bot = new ChatBot(messengerConfig.Token);
+                        var message = MessageBuilder.Build(dataParsed);
+                        await bot.Post(message, device.ChatId);
+                    }
+
+                    if (isNewResponse)
+                    {
+                        await stateRepository.Add(new StationState(dataParsed, device.StationId));
+                    }
 
                     context.Logger.LogInformation($"Device with StationId: {device.StationId} was processed successfully.");
                 }
