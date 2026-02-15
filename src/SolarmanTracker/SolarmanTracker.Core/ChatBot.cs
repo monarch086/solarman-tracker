@@ -5,16 +5,33 @@ namespace SolarmanTracker.Core
 {
     public sealed class ChatBot
     {
-        private TelegramBotClient client;
+        private readonly TelegramBotClient client;
+        private string stage = string.Empty;
 
-        public ChatBot(string token)
+        private const string APP_NAME = "SolarmanTracker";
+        private const string PERSONAL_CHAT_ID = "38627946";
+
+        public ChatBot(string stage, string token)
         {
+            this.stage = stage;
             client = new TelegramBotClient(token);
         }
 
         public async Task Post(string message, string chatId)
         {
             await client.SendMessage(chatId, message, Telegram.Bot.Types.Enums.ParseMode.Html);
+        }
+
+        public async Task PostWarning(string message)
+        {
+            var warningMessage = $"⚠️ <b>Attention!</b>\n{APP_NAME}-{stage}\n{message}";
+            await client.SendMessage(PERSONAL_CHAT_ID, warningMessage, Telegram.Bot.Types.Enums.ParseMode.Html);
+        }
+
+        public async Task PostError(string message)
+        {
+            var errorMessage = $"❌ <b>Error!</b>\n{APP_NAME}-{stage}\n{message}";
+            await client.SendMessage(PERSONAL_CHAT_ID, errorMessage, Telegram.Bot.Types.Enums.ParseMode.Html);
         }
 
         public async Task PostImage(string fileName, string text, string chatId)

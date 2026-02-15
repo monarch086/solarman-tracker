@@ -24,6 +24,7 @@ public class Function
         var stateRepository = new StationStateRepository(stage, context.Logger);
 
         var messengerConfig = await SsmConfigBuilder.Build(stage, context.Logger);
+        var bot = new ChatBot(stage, messengerConfig.Token);
 
         var dataLoader = new SolarmanDataLoader(context.Logger);
 
@@ -40,6 +41,7 @@ public class Function
                     if (dataParsed == null)
                     {
                         context.Logger.LogWarning($"Failed to parse real-time data for StationId: {device.StationId}. Skipping.");
+                        await bot.PostError($"Failed to parse real-time data for StationId: {device.StationId}. Skipping.");
                         continue;
                     }
                     var latestState = await stateRepository.GetLatest(device.StationId);
@@ -57,7 +59,7 @@ public class Function
 
                     if (isStateChanged)
                     {
-                        var bot = new ChatBot(messengerConfig.Token);
+                        
                         var message = MessageBuilder.Build(dataParsed);
                         await bot.Post(message, device.ChatId);
                     }
@@ -66,6 +68,8 @@ public class Function
                     {
                         await stateRepository.Add(new StationState(dataParsed, device.StationId));
                     }
+
+                    await CheckTokenExpiration(device, bot);
 
                     context.Logger.LogInformation($"Device with StationId: {device.StationId} was processed successfully.");
                 }
@@ -77,9 +81,18 @@ public class Function
             catch (Exception ex)
             {
                 context.Logger.LogError($"Error processing device with StationId: {device.StationId} - {ex.Message}");
+                await bot.PostError($"Error processing device with StationId: {device.StationId} - {ex.Message}");
             }
         }
 
         context.Logger.LogInformation("Devices processing complete.");
+    }
+
+    public async Task CheckTokenExpiration(Config device, ChatBot bot)
+    {
+        if (device.AccessTokenExpDate.HasValue && device.AccessTokenExpDate.Value <= DateTime.UtcNow.AddDays(7))
+        {
+            await bot.PostWarning(MessageBuilder.BuildTokenExpirationMessage(device));
+        }
     }
 }

@@ -12,7 +12,7 @@
 
         public string AccessToken { get; set; }
 
-        public DateTime AccessTokenExpDate { get; set; }
+        public DateTime? AccessTokenExpDate { get; set; }
 
         public string RefreshToken { get; set; }
 

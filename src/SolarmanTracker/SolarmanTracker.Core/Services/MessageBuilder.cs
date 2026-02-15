@@ -1,4 +1,5 @@
-﻿using SolarmanTracker.Core.DataModel.DataLoaderModels;
+﻿using SolarmanTracker.Core.DataModel;
+using SolarmanTracker.Core.DataModel.DataLoaderModels;
 using SolarmanTracker.Core.Extensions;
 using System.Text;
 
@@ -30,6 +31,14 @@ namespace SolarmanTracker.Core.Services
             sb.Append($"Час оновлення даних: {response.lastUpdateTime.ToKyivTime().ToString(TIME_FORMAT)}.");
 
             return sb.ToString();
+        }
+
+        public static string BuildTokenExpirationMessage(Config device)
+        {
+            var expirationDate = device.AccessTokenExpDate.HasValue
+                ? device.AccessTokenExpDate.Value.ToKyivTime().ToString(TIME_FORMAT)
+                : string.Empty;
+            return $"Access token for StationId: {device.StationId} is expiring soon on {expirationDate}.";
         }
     }
 }
