@@ -14,6 +14,8 @@ namespace SolarmanTracker.Core.DataModel
 
         public string JsonData { get; set; }
 
+        public bool IsLostConnectionSent { get; set; }
+
         public StationState() { }
 
         public StationState(RealTimeStationResponse response, string stationId)
@@ -22,6 +24,7 @@ namespace SolarmanTracker.Core.DataModel
             Date = DateTime.UtcNow.ToString("O");
             StateDate = response.lastUpdateTime.ToString("O");
             JsonData = JsonSerializer.Serialize(response, SerializationConstants.SerializerOptions);
+            IsLostConnectionSent = false;
         }
 
         public RealTimeStationResponse ToResponse()

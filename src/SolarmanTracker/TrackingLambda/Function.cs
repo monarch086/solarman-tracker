@@ -63,7 +63,14 @@ public class Function
 
                     if (isNewResponse)
                     {
-                        await stateRepository.Add(new StationState(dataParsed, device.StationId));
+                        await stateRepository.AddOrUpdate(new StationState(dataParsed, device.StationId));
+                    }
+                    else if (latestState != null && !latestState.IsLostConnectionSent)
+                    {
+                        var message = MessageBuilder.BuildLostConnectionMessage(dataParsed);
+                        await bot.Post(message, device.ChatId);
+                        latestState.IsLostConnectionSent = true;
+                        await stateRepository.AddOrUpdate(latestState);
                     }
 
                     await CheckTokenExpiration(device, bot);

@@ -21,7 +21,7 @@ namespace SolarmanTracker.Core.Repositories
             this.logger = logger;
         }
 
-        public async Task Add(StationState state)
+        public async Task AddOrUpdate(StationState state)
         {
             await stateTable.PutItemAsync(state.ToDocument());
         }

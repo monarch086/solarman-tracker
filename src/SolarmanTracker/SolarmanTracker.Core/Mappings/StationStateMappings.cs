@@ -14,6 +14,7 @@ namespace SolarmanTracker.Core.Mappings
                   { "Date", new AttributeValue { S = record.Date }},
                   { "StateDate", new AttributeValue { S = record.StateDate }},
                   { "JsonData", new AttributeValue { S = record.JsonData }},
+                  { "IsLostConnectionSent", new AttributeValue { BOOL = record.IsLostConnectionSent }},
               };
 
             return Document.FromAttributeMap(attributes);
@@ -26,7 +27,8 @@ namespace SolarmanTracker.Core.Mappings
                 StationId = document["StationId"].AsString(),
                 Date = document["Date"].AsString(),
                 StateDate = document["StateDate"].AsString(),
-                JsonData = document["JsonData"].AsString()
+                JsonData = document["JsonData"].AsString(),
+                IsLostConnectionSent = document.ContainsKey("IsLostConnectionSent") ? document["IsLostConnectionSent"].AsBoolean() : false,
             };
         }
     }

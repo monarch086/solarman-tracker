@@ -40,5 +40,11 @@ namespace SolarmanTracker.Core.Services
                 : string.Empty;
             return $"Access token for StationId: {device.StationId} is expiring soon on {expirationDate}.";
         }
+
+        public static string BuildLostConnectionMessage(RealTimeStationResponse response)
+        {
+            var lastUpdateTime = response.lastUpdateTime.ToKyivTime().ToString(TIME_FORMAT);
+            return $"⚠️ Втрата зв'язку зі станцією з {lastUpdateTime}.";
+        }
     }
 }
