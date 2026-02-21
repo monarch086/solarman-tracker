@@ -1,20 +1,23 @@
-﻿using Telegram.Bot;
+﻿using Amazon.Lambda.Core;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 
 namespace SolarmanTracker.Core
 {
     public sealed class ChatBot
     {
+        private readonly ILambdaLogger logger;
         private readonly TelegramBotClient client;
         private string stage = string.Empty;
 
         private const string APP_NAME = "SolarmanTracker";
         private const string PERSONAL_CHAT_ID = "38627946";
 
-        public ChatBot(string stage, string token)
+        public ChatBot(string stage, string token, ILambdaLogger logger)
         {
             this.stage = stage;
             client = new TelegramBotClient(token);
+            this.logger = logger;
         }
 
         public async Task Post(string message, string chatId)
@@ -24,12 +27,16 @@ namespace SolarmanTracker.Core
 
         public async Task PostWarning(string message)
         {
+            logger.LogWarning(message);
+
             var warningMessage = $"⚠️ <b>Attention!</b>\n{APP_NAME}-{stage}\n{message}";
             await client.SendMessage(PERSONAL_CHAT_ID, warningMessage, Telegram.Bot.Types.Enums.ParseMode.Html);
         }
 
         public async Task PostError(string message)
         {
+            logger.LogError(message);
+
             var errorMessage = $"❌ <b>Error!</b>\n{APP_NAME}-{stage}\n{message}";
             await client.SendMessage(PERSONAL_CHAT_ID, errorMessage, Telegram.Bot.Types.Enums.ParseMode.Html);
         }

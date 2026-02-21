@@ -24,7 +24,7 @@ public class Function
         var stateRepository = new StationStateRepository(stage, context.Logger);
 
         var messengerConfig = await SsmConfigBuilder.Build(stage, context.Logger);
-        var bot = new ChatBot(stage, messengerConfig.Token);
+        var bot = new ChatBot(stage, messengerConfig.Token, context.Logger);
 
         var dataLoader = new SolarmanDataLoader(context.Logger);
 
@@ -40,7 +40,6 @@ public class Function
                     var dataParsed = JsonSerializer.Deserialize<RealTimeStationResponse>(realTimeData);
                     if (dataParsed == null)
                     {
-                        context.Logger.LogWarning($"Failed to parse real-time data for StationId: {device.StationId}. Skipping.");
                         await bot.PostError($"Failed to parse real-time data for StationId: {device.StationId}. Skipping.");
                         continue;
                     }
@@ -54,12 +53,10 @@ public class Function
                         || dataParsed.batterySoc != latestResponse.batterySoc
                         || dataParsed.isElectricityPresent != latestResponse.isElectricityPresent;
 
-                    context.Logger.LogInformation($"Device with StationId: {device.StationId}, isNewResponse: {isNewResponse}.");
-                    context.Logger.LogInformation($"Device with StationId: {device.StationId}, isStateChanged: {isStateChanged}.");
+                    context.Logger.LogInformation($"Device with StationId: {device.StationId}, isNewResponse: {isNewResponse}, isStateChanged: {isStateChanged}");
 
                     if (isStateChanged)
                     {
-                        
                         var message = MessageBuilder.Build(dataParsed);
                         await bot.Post(message, device.ChatId);
                     }
@@ -80,7 +77,6 @@ public class Function
             }
             catch (Exception ex)
             {
-                context.Logger.LogError($"Error processing device with StationId: {device.StationId} - {ex.Message}");
                 await bot.PostError($"Error processing device with StationId: {device.StationId} - {ex.Message}");
             }
         }
