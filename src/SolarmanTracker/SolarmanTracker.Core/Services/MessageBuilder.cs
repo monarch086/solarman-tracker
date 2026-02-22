@@ -12,7 +12,8 @@ namespace SolarmanTracker.Core.Services
         private const string CHECK_ICON = "✅";
         private const string CROSS_ICON = "❌";
 
-        private const string TIME_FORMAT = @"dd MMM H:mm";
+        private const string DATE_TIME_FORMAT = @"dd MMM H:mm";
+        private const string TIME_FORMAT = @"H:mm";
 
         public static string Build(RealTimeStationResponse response)
         {
@@ -28,7 +29,7 @@ namespace SolarmanTracker.Core.Services
             }
 
             sb.Append($"Рівень заряду батарей: {response.batterySoc}%\n");
-            sb.Append($"Час оновлення даних: {response.lastUpdateTime.ToKyivTime().ToString(TIME_FORMAT)}.");
+            sb.Append($"Час оновлення даних: {response.lastUpdateTime.ToKyivTime().ToString(DATE_TIME_FORMAT)}.");
 
             return sb.ToString();
         }
@@ -36,7 +37,7 @@ namespace SolarmanTracker.Core.Services
         public static string BuildTokenExpirationMessage(Config device)
         {
             var expirationDate = device.AccessTokenExpDate.HasValue
-                ? device.AccessTokenExpDate.Value.ToKyivTime().ToString(TIME_FORMAT)
+                ? device.AccessTokenExpDate.Value.ToKyivTime().ToString(DATE_TIME_FORMAT)
                 : string.Empty;
             return $"Access token for StationId: {device.StationId} is expiring soon on {expirationDate}.";
         }
@@ -44,7 +45,7 @@ namespace SolarmanTracker.Core.Services
         public static string BuildLostConnectionMessage(RealTimeStationResponse response)
         {
             var lastUpdateTime = response.lastUpdateTime.ToKyivTime().ToString(TIME_FORMAT);
-            return $"⚠️ Втрата зв'язку зі станцією з {lastUpdateTime}.";
+            return $"⚠️ Втрачено зв'язок з інвертором з {lastUpdateTime}. Останній зареєстрований рівень заряду батарей: {response.batterySoc}%";
         }
     }
 }

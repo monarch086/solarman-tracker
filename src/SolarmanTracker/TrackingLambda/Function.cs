@@ -67,7 +67,11 @@ public class Function
                     }
                     else if (latestState != null && !latestState.IsLostConnectionSent)
                     {
-                        var message = MessageBuilder.BuildLostConnectionMessage(dataParsed);
+                        var mostRecentResponse = latestResponse!.lastUpdateTime > dataParsed.lastUpdateTime
+                            ? latestResponse
+                            : dataParsed;
+
+                        var message = MessageBuilder.BuildLostConnectionMessage(mostRecentResponse);
                         await bot.Post(message, device.ChatId);
                         latestState.IsLostConnectionSent = true;
                         await stateRepository.AddOrUpdate(latestState);
