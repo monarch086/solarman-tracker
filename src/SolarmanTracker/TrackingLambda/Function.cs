@@ -51,7 +51,8 @@ public class Function
                     var isNewResponse = latestResponse == null || dataParsed.lastUpdateTime > latestResponse.lastUpdateTime;
                     var isStateChanged = latestResponse == null
                         || dataParsed.batterySoc != latestResponse.batterySoc
-                        || dataParsed.isElectricityPresent != latestResponse.isElectricityPresent;
+                        || dataParsed.isElectricityPresent != latestResponse.isElectricityPresent
+                        || (dataParsed.lastUpdateTime > latestResponse.lastUpdateTime && (latestState?.IsLostConnectionSent ?? false));
 
                     context.Logger.LogInformation($"Device with StationId: {device.StationId}, isNewResponse: {isNewResponse}, isStateChanged: {isStateChanged}");
 
