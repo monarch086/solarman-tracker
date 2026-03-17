@@ -30,6 +30,8 @@ namespace SolarmanTracker.Core.DataModel.DataLoaderModels
 
         public bool success { get; set; }
 
+        public string? msg { get; set; }
+
         [JsonIgnore]
         public bool isElectricityPresent => wirePower.HasValue && wirePower.Value > 0;
     }

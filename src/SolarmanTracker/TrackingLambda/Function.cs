@@ -43,6 +43,13 @@ public class Function
                         await bot.PostError($"Failed to parse real-time data for StationId: {device.StationId}. Skipping.");
                         continue;
                     }
+
+                    if (!dataParsed.success)
+                    {
+                        await bot.PostError($"Failed to retrieve real-time data for StationId: {device.StationId}. Message: {dataParsed.msg}.");
+                        continue;
+                    }
+
                     var latestState = await stateRepository.GetLatest(device.StationId);
                     var latestResponse = !string.IsNullOrWhiteSpace(latestState?.JsonData)
                         ? JsonSerializer.Deserialize<RealTimeStationResponse>(latestState.JsonData)
