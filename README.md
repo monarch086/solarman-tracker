@@ -14,4 +14,6 @@ cd ./src/SolarmanTracker
 ````sh
 cd ./src/SolarmanTracker
 serverless deploy --stage [dev/prod] [--force]
+# Example
+serverless deploy --stage prod --force
 ````
